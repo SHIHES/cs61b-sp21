@@ -1,5 +1,9 @@
 package lesson;
 
+/**
+ * @author SHIHS 2023/2/3
+ * @resource <a href="https://joshhug.gitbooks.io/hug61b/content/chap2/chap22.html">...</a>
+ */
 public class SLList {
     public static class IntNode {
         public int item;
@@ -12,7 +16,7 @@ public class SLList {
     }
 
     /**
-     *  The sentinel or dummy item will always the first of the list. It can prevent the null exception happening.
+     * The sentinel or dummy item will always the first of the list. It can prevent the null exception happening.
      */
     private IntNode sentinel;
     private int fastSize;
@@ -24,9 +28,19 @@ public class SLList {
         fastSize = 1;
     }
 
-    public SLList() {
+    public SLList () {
         sentinel = new IntNode(9487, null);
         fastSize = 0;
+    }
+
+    public SLList(int[] list) {
+        sentinel = new IntNode(9487, null);
+        IntNode p = sentinel;
+        for(int i = 0; i < list.length; i++) {
+            p.next = new IntNode(list[i], null);
+            p = p.next;
+        }
+        fastSize = list.length;
     }
 
     public void addFirst(int i) {
@@ -35,7 +49,12 @@ public class SLList {
     }
 
     public int getFirst() {
-        return sentinel.next.item;
+        if (sentinel.next != null) {
+            return sentinel.next.item;
+        } else {
+            return -1;
+        }
+
     }
 
     public int getLast() {
@@ -58,6 +77,11 @@ public class SLList {
         p.next = new IntNode(i, null);
     }
 
+    /**
+     * Encapsulate the size method
+     * @param node
+     * @return
+     */
     private int size(IntNode node) {
         if (node.next == null) {
             return 1;
@@ -70,13 +94,34 @@ public class SLList {
         return size(sentinel.next);
     }
 
+    public void deleteFirst() {
+        IntNode p = sentinel;
+        // 存在第一項
+        if (p.next != null) {
+            fastSize--;
+            // 存在第二項
+            if (p.next.next != null) {
+                IntNode second = sentinel.next;
+                p.next = p.next.next;
+
+                // Remove the remove item ref. to prevent memory leak
+                second.next = null;
+            } else {
+                sentinel.next = null;
+            }
+
+        }
+    }
+
     public static void main(String[] args) {
-        SLList l = new SLList();
+        SLList l = new SLList(new int[]{2,7,10,11});
         l.addLast(80);
         l.addFirst(7);
         l.addLast(88);
         System.out.println(l.getLast());
         System.out.println(l.size());
+        l.deleteFirst();
+        l.deleteFirst();
         System.out.println(l.getFirst());
     }
 }
