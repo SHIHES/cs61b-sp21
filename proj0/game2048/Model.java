@@ -139,59 +139,58 @@ public class Model extends Observable {
      * and the trailing tile does not.
      */
     public boolean tilt(Side side) {
-        boolean changed;
+        boolean changed = false;
 
-        // TODO: Modify this.board (and perhaps this.score) to account
-        for (int c = 0; c < board.size(); c += 1) {
-            oneDealWithCol(c);
+        board.setViewingPerspective(side);
+        for (int colNumber = 0; colNumber < board.size(); colNumber += 1) {
+            int size = board.size();
+            // 目的地格子，判斷完該merge/empty的處理後向下移
+            int desIndex = size - 1;
+            // 從上往下處理
+            for (int row = size - 1; row >= 0; row -= 1) {
+                Tile desTile = board.tile(colNumber, desIndex);
+                Tile currTile = board.tile(colNumber, row);
+
+                // 處理每個row的tile該去哪裡
+                if (currTile != null) {
+                    boolean isDesTileExist = false;
+                    // 避免NPE
+                    if (desTile != null) {
+                        isDesTileExist = true;
+                    }
+                    // 目的地存在格子 且 跟當前格子值相同
+                    if (isDesTileExist && currTile.value() == desTile.value()) {
+                        // 避免最頂端格子還需要move的問題
+                        if (row != size - 1) {
+                            score += currTile.value() * 2;
+                            board.move(colNumber, desIndex, currTile);
+                            desIndex -= 1;
+                            changed = true;
+                        }
+                    }
+                    // 目的地存在格子 且 跟當前格子值不同
+                    else if (isDesTileExist && currTile.value() != desTile.value()) {
+                        desIndex -= 1;
+                        // 避免 移動格子和目的地為相同的問題
+                        if (row != desIndex) {
+                            board.move(colNumber, desIndex, currTile);
+                            changed = true;
+                        }
+                    }
+                    // 目的地不存在
+                    else {
+                        board.move(colNumber, desIndex, currTile);
+                        changed = true;
+                    }
+                }
+            }
         }
-        changed = true;
-
         checkGameOver();
+        board.setViewingPerspective(Side.NORTH);
         if (changed) {
             setChanged();
         }
         return changed;
-    }
-
-    /**
-     * 只處理單一 Col，由上到下進行(因為所有 tile 都被設計成往上)
-     *
-     * @param colNumber
-     */
-    public void oneDealWithCol(int colNumber) {
-        int size = board.size();
-        // 目的地格子，判斷完該merge/empty的處理後向下移
-        int moveIndex = size - 1;
-        // 從上往下處理
-        for (int row = size - 1; row >= 0; row -= 1) {
-            // 處理每個row的tile該去哪裡
-            if (board.tile(colNumber, row) != null) {
-                boolean isMoveIndexTileExist = false;
-                // 避免NPE
-                if (board.tile(colNumber, moveIndex) != null) {
-                    isMoveIndexTileExist = true;
-                }
-                // 目的地存在格子 且 跟當前格子值相同
-                if (isMoveIndexTileExist && board.tile(colNumber, row).value() == board.tile(colNumber, moveIndex).value()) {
-                    // 避免最頂端格子還需要move的問題
-                    if (row != size - 1) {
-                        score += board.tile(colNumber, row).value() * 2;
-                        board.move(colNumber, moveIndex, board.tile(colNumber, row));
-                        moveIndex -= 1;
-                    }
-                }
-                // 目的地存在格子 且 跟當前格子值不同
-                else if (isMoveIndexTileExist && board.tile(colNumber, row).value() != board.tile(colNumber, moveIndex).value()) {
-                    board.move(colNumber, moveIndex, board.tile(colNumber, row));
-                    moveIndex -= 1;
-                }
-                // 目的地不存在
-                else {
-                    board.move(colNumber, moveIndex, board.tile(colNumber, row));
-                }
-            }
-        }
     }
 
     /**
@@ -313,4 +312,62 @@ public class Model extends Observable {
     public int hashCode() {
         return toString().hashCode();
     }
+// 沒用到的神祕解答
+//    public boolean tilt(Side side) {
+//        boolean changed;
+//        changed = false;
+//
+//        // TODO: Modify this.board (and perhaps this.score) to account
+//        // for the tilt to the Side SIDE. If the board changed, set the
+//        // changed local variable to true.
+//
+//        board.setViewingPerspective(side);
+//
+//        for (int col = 0; col < board.size(); col += 1) {
+//            for (int row = board.size() - 1; row >= 0; row -= 1) {
+//                Tile t1 = board.tile(col, row);
+//                if (t1 != null) {
+//                    for (int row2 = row - 1; row2 >= 0; row2 -= 1) {
+//                        Tile t2 = board.tile(col, row2);
+//                        if (t2 != null) {
+//                            if (t1.value() == t2.value()) {
+//                                board.move(col, row, t2);
+//                                changed = true;
+//                                score += 2 * t1.value();
+//                                row = row2;
+//                                break;
+//                            } else {
+//                                break;
+//                            }
+//                        } else {
+//                            continue;
+//                        }
+//                    }
+//                }
+//
+//            }
+//        }
+//
+//        for (int col = 0; col < board.size(); col += 1) {
+//            for (int row = board.size() - 1; row >= 0; row -= 1) {
+//                Tile t1 = board.tile(col, row);
+//                if (t1 == null) {
+//                    for (int row2 = row - 1; row2 >= 0; row2 -= 1) {
+//                        Tile t2 = board.tile(col, row2);
+//                        if (t2 != null) {
+//                            board.move(col, row, t2);
+//                            changed = true;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        board.setViewingPerspective(Side.NORTH);
+//        checkGameOver();
+//        if (changed) {
+//            setChanged();
+//        }
+//        return changed;
+//    }
 }
