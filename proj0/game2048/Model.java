@@ -105,6 +105,7 @@ public class Model extends Observable {
 
     /**
      * Clear the board to empty and reset the score.
+     * 主方法從board呼叫
      */
     public void clear() {
         score = 0;
@@ -116,6 +117,7 @@ public class Model extends Observable {
     /**
      * Add TILE to the board. There must be no Tile currently at the
      * same position.
+     * 主方法從board呼叫
      */
     public void addTile(Tile tile) {
         board.addTile(tile);
@@ -138,17 +140,58 @@ public class Model extends Observable {
      */
     public boolean tilt(Side side) {
         boolean changed;
-        changed = false;
 
         // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
+        for (int c = 0; c < board.size(); c += 1) {
+            oneDealWithCol(c);
+        }
+        changed = true;
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    /**
+     * 只處理單一 Col，由上到下進行(因為所有 tile 都被設計成往上)
+     *
+     * @param colNumber
+     */
+    public void oneDealWithCol(int colNumber) {
+        int size = board.size();
+        // 目的地格子，判斷完該merge/empty的處理後向下移
+        int moveIndex = size - 1;
+        // 從上往下處理
+        for (int row = size - 1; row >= 0; row -= 1) {
+            // 處理每個row的tile該去哪裡
+            if (board.tile(colNumber, row) != null) {
+                boolean isMoveIndexTileExist = false;
+                // 避免NPE
+                if (board.tile(colNumber, moveIndex) != null) {
+                    isMoveIndexTileExist = true;
+                }
+                // 目的地存在格子 且 跟當前格子值相同
+                if (isMoveIndexTileExist && board.tile(colNumber, row).value() == board.tile(colNumber, moveIndex).value()) {
+                    // 避免最頂端格子還需要move的問題
+                    if (row != size - 1) {
+                        score += board.tile(colNumber, row).value() * 2;
+                        board.move(colNumber, moveIndex, board.tile(colNumber, row));
+                        moveIndex -= 1;
+                    }
+                }
+                // 目的地存在格子 且 跟當前格子值不同
+                else if (isMoveIndexTileExist && board.tile(colNumber, row).value() != board.tile(colNumber, moveIndex).value()) {
+                    board.move(colNumber, moveIndex, board.tile(colNumber, row));
+                    moveIndex -= 1;
+                }
+                // 目的地不存在
+                else {
+                    board.move(colNumber, moveIndex, board.tile(colNumber, row));
+                }
+            }
+        }
     }
 
     /**

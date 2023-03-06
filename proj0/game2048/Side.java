@@ -20,9 +20,18 @@ public enum Side {
      *  col() and row() methods below to translate from reoriented to
      *  standard coordinates, one can arrange to use exactly the same code
      *  to compute the result of tilting the board in any particular
-     *  direction. */
+     *  direction.
+     *
+     * Side 是用旋轉來改變座標的，以左下角為錨點
+     * EAST 順時針轉 90
+     * WEST 逆時針轉 90
+     * SOUTH 轉 180
+     * NORTH 轉 360
+     */
 
-    NORTH(0, 0, 0, 1), EAST(0, 1, 1, 0), SOUTH(1, 1, 0, -1),
+    NORTH(0, 0, 0, 1),
+    EAST(0, 1, 1, 0),
+    SOUTH(1, 1, 0, -1),
     WEST(1, 0, -1, 0);
 
     /** The side that is in the direction (DCOL, DROW) from any square

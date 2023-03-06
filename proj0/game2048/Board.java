@@ -11,7 +11,9 @@ import java.util.Random;
  * @author hug
  */
 public class Board implements Iterable<Tile> {
-    /** Current contents of the board. */
+    /** Current contents of the board.
+     * 當前板子上所有tile的狀態，沒有就是null
+     * */
     private Tile[][] values;
     /** Side that the board currently views as north. */
     private Side viewPerspective;
@@ -27,7 +29,10 @@ public class Board implements Iterable<Tile> {
     }
 
     /** Create a board where RAWVALUES hold the values of the tiles on the board 
-     * (0 is null) with a current score of SCORE and the viewing perspective set to north. */
+     * (0 is null) with a current score of SCORE and the viewing perspective set to north.
+     * 將兩層int數列轉換成兩層Tile數列
+     */
+
     public Board(int[][] rawValues, int score) {
         int size = rawValues.length;
         values = new Tile[size][size];
@@ -46,7 +51,10 @@ public class Board implements Iterable<Tile> {
         }
     }
 
-    /** Returns the size of the board. */
+    /** Returns the size of the board.
+     * EX: 4 * 4 回傳 4
+     */
+
     public int size() {
         return values.length;
     }
@@ -57,7 +65,9 @@ public class Board implements Iterable<Tile> {
     }
 
     /** Return the current Tile at (COL, ROW), when sitting with the board
-     *  oriented so that SIDE is at the top (farthest) from you. */
+     *  oriented so that SIDE is at the top (farthest) from you.
+     *  當為非 North 方向的移動，呼叫能normalize的方法找到棋盤中該tile
+     *  */
     private Tile vtile(int col, int row, Side side) {
         return values[side.col(col, row, size())][side.row(col, row, size())];
     }
@@ -84,20 +94,25 @@ public class Board implements Iterable<Tile> {
      * treated as coordinates with respect to the current viewPerspective.
      *
      * Returns whether or not this move is a merge.
+     *
+     * 要先改viewPerspective 再 move
      * */
     public boolean move(int col, int row, Tile tile) {
         int pcol = viewPerspective.col(col, row, size()),
                 prow = viewPerspective.row(col, row, size());
+        // 根本沒動
         if (tile.col() == pcol && tile.row() == prow) {
             return false;
         }
         Tile tile1 = vtile(col, row, viewPerspective);
         values[tile.col()][tile.row()] = null;
 
+        // 紀錄棋盤，移動至相對位置
         if (tile1 == null) {
             values[pcol][prow] = tile.move(pcol, prow);
             return false;
         } else {
+            // 若有人，就執行merge，
             values[pcol][prow] = tile.merge(pcol, prow, tile1);
             return true;
         }
@@ -121,7 +136,7 @@ public class Board implements Iterable<Tile> {
         return out.toString();
     }
 
-    /** Iterates through teach tile in the board. */
+    /** Iterates through each tile in the board. */
     private class AllTileIterator implements Iterator<Tile>, Iterable<Tile> {
         int r, c;
 

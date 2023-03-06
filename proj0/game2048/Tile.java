@@ -31,7 +31,11 @@ public class Tile {
     }
 
     /** Return my next state.  Before I am moved or merged, I am my
-     *  own successor. */
+     *  own successor.
+     *  tile 經過move, merge 操作某個tile，透過呼叫這個function，可以知道tile未來會是什麼狀態
+     *
+     *  不應該直接使用這邊的create, move, next，因為不會記錄在棋盤中，要使用只能使用Board類別的addTitle, move
+     *  */
     public Tile next() {
         return next == null ? this : next;
     }
@@ -57,7 +61,9 @@ public class Tile {
     }
 
     /** Return the distance in rows or columns between me and my successor
-     *  tile (0 if I have no successor). */
+     *  tile (0 if I have no successor).
+     *  回傳未來位置和當前位置的距離
+     *  */
     public int distToNext() {
         if (next == null) {
             return 0;
@@ -78,6 +84,8 @@ public class Tile {
     /** My last position on the board. */
     private final int row, col;
 
-    /** Successor tile: one I am moved to or merged with. */
+    /** Successor tile: one I am moved to or merged with.
+     * 擁有未來狀態的 tile
+     * */
     private Tile next;
 }
