@@ -1,5 +1,8 @@
 package timingtest;
+
 import edu.princeton.cs.algs4.Stopwatch;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hug.
@@ -18,11 +21,39 @@ public class TimeSLList {
     }
 
     public static void main(String[] args) {
-        timeGetLast();
+        AList<Integer> seq = new AList<>();
+        AList<Double> times = new AList<>();
+        AList<Integer> ops = new AList<>();
+
+        seq.addLast(100000);
+        seq.addLast(200000);
+        seq.addLast(400000);
+        seq.addLast(800000);
+        seq.addLast(1600000);
+        seq.addLast(3200000);
+        seq.addLast(6400000);
+        seq.addLast(12800000);
+
+        for (int i = 0; i < seq.size(); i += 1) {
+            ops.addLast(10000);
+        }
+
+        timeGetLast(seq, times, ops);
+        printTimingTable(seq, times, ops);
     }
 
-    public static void timeGetLast() {
-        // TODO: YOUR CODE HERE
+    public static void timeGetLast(AList<Integer> seq, AList<Double> times, AList<Integer> opCounts){
+        for (int i = 0; i < seq.size(); i += 1) {
+            SLList<Integer> slList = new SLList<>();
+            for (int j = 0; j < seq.get(i); j += 1) {
+                slList.addFirst(j);
+            }
+            Stopwatch sw = new Stopwatch();
+            for (int k = 0; k < opCounts.size(); k += 1) {
+                slList.getLast();
+            }
+            double time = sw.elapsedTime();
+            times.addLast(time);
+        }
     }
-
 }
