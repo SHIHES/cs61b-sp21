@@ -25,14 +25,14 @@ public class TimeSLList {
         AList<Double> times = new AList<>();
         AList<Integer> ops = new AList<>();
 
-        seq.addLast(100000);
-        seq.addLast(200000);
-        seq.addLast(400000);
-        seq.addLast(800000);
-        seq.addLast(1600000);
-        seq.addLast(3200000);
-        seq.addLast(6400000);
-        seq.addLast(12800000);
+        seq.addLast(1000);
+        seq.addLast(2000);
+        seq.addLast(4000);
+        seq.addLast(8000);
+        seq.addLast(16000);
+        seq.addLast(32000);
+        seq.addLast(64000);
+        seq.addLast(128000);
 
         for (int i = 0; i < seq.size(); i += 1) {
             ops.addLast(10000);
